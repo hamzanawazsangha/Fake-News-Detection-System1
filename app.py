@@ -11,6 +11,9 @@ from tensorflow.keras.models import load_model
 import os
 from datetime import datetime
 from sklearn.feature_extraction.text import TfidfVectorizer
+import gdown
+from io import BytesIO
+import requests
 
 # Download NLTK data
 nltk.download('punkt')
@@ -37,22 +40,83 @@ def save_comment(name, email, comment):
         f.write(f"Comment: {comment}\n")
         f.write("-" * 50 + "\n\n")
 
-# Load models
+# Google Drive base URL and folder ID
+DRIVE_BASE_URL = "https://drive.google.com/uc?id="
+DRIVE_FOLDER_ID = "1fKB1UT6Zdd5cRsK53pfZHs2IZDD6WNo4" 
+
+# File name mapping (maintaining your original filenames)
+FILE_MAPPING = {
+    # Models
+    'Logistic Regression.pkl': 'Logistic Regression',
+    'Random Forest.pkl': 'Random Forest',
+    'SVC.pkl': 'Support Vector Machine',
+    'KNeighbors Classifier.pkl': 'K-Nearest Neighbors',
+    'XGBOOST.pkl': 'XGBoost',
+    'Fakenews.h5': 'Neural Network (Best Model)',
+    
+    # Classification Reports
+    'classification_LR.pkl': ('classification_reports', 'Logistic Regression'),
+    'classification_RF.pkl': ('classification_reports', 'Random Forest'),
+    'classification_svc.pkl': ('classification_reports', 'Support Vector Machine'),
+    'classification_KNN.pkl': ('classification_reports', 'K-Nearest Neighbors'),
+    'classification_xgb.pkl': ('classification_reports', 'XGBoost'),
+    'classification_Neural.pkl': ('classification_reports', 'Neural Network (Best Model)'),
+    
+    # ROC Data
+    'roc_data_LR.pkl': ('roc_data', 'Logistic Regression'),
+    'roc_data_RF.pkl': ('roc_data', 'Random Forest'),
+    'roc_data_svc.pkl': ('roc_data', 'Support Vector Machine'),
+    'roc_data_KNN.pkl': ('roc_data', 'K-Nearest Neighbors'),
+    'roc_data_xgb.pkl': ('roc_data', 'XGBoost'),
+    'roc_data_neural.pkl': ('roc_data', 'Neural Network (Best Model)'),
+    
+    # Confusion Matrices
+    'confusion_LR.pkl': ('confusion_matrices', 'Logistic Regression'),
+    'confusion_RF.pkl': ('confusion_matrices', 'Random Forest'),
+    'confusion_svc.pkl': ('confusion_matrices', 'Support Vector Machine'),
+    'confusion_KNN.pkl': ('confusion_matrices', 'K-Nearest Neighbors'),
+    'confusion_xgb.pkl': ('confusion_matrices', 'XGBoost'),
+    'confusion_Neural.pkl': ('confusion_matrices', 'Neural Network (Best Model)')
+}
+
+# Function to download file from Google Drive
+@st.cache_data
+def download_file_from_drive(file_name):
+    """Download file from Google Drive maintaining original filename"""
+    try:
+        # Get direct download link (assuming files are in same folder)
+        url = f"{DRIVE_BASE_URL}{DRIVE_FOLDER_ID}"
+        response = requests.get(url)
+        
+        if response.status_code == 200:
+            return BytesIO(response.content)
+        else:
+            st.error(f"Failed to download {file_name}")
+            return None
+    except Exception as e:
+        st.error(f"Error downloading {file_name}: {str(e)}")
+        return None
+
+# Load models from Google Drive
 @st.cache_resource
 def load_models():
-    models = {
-        'Logistic Regression': pickle.load(open('assets/models/Logistic Regression.pkl', 'rb')),
-        'Random Forest': pickle.load(open('assets/models/Random Forest.pkl', 'rb')),
-        'Support Vector Machine': pickle.load(open('assets/models/SVC.pkl', 'rb')),
-        'K-Nearest Neighbors': pickle.load(open('assets/models/KNeighbors Classifier.pkl', 'rb')),
-        'XGBoost': pickle.load(open('assets/models/XGBOOST.pkl', 'rb')),
-        'Neural Network (Best Model)': load_model('assets/models/Fakenews.h5')
-    }
+    models = {}
+    for file_name, model_name in FILE_MAPPING.items():
+        if file_name.endswith('.pkl') or file_name.endswith('.h5'):
+            file_content = download_file_from_drive(file_name)
+            if file_content:
+                try:
+                    if file_name.endswith('.h5'):
+                        models[model_name] = load_model(file_content)
+                    else:
+                        models[model_name] = pickle.load(file_content)
+                except Exception as e:
+                    st.error(f"Error loading {model_name}: {str(e)}")
     return models
 
 models = load_models()
 
-# Load evaluation data
+# Load evaluation data from Google Drive
 @st.cache_data
 def load_evaluation_data():
     evaluation_data = {
@@ -64,31 +128,21 @@ def load_evaluation_data():
             'XGBoost': 0.99,
             'Neural Network (Best Model)': 0.99
         },
-        'classification_reports': {
-            'Logistic Regression': pickle.load(open('assets/classification report/classification_LR.pkl', 'rb')),
-            'Random Forest': pickle.load(open('assets/classification report/classification_RF.pkl', 'rb')),
-            'Support Vector Machine': pickle.load(open('assets/classification report/classification_svc.pkl', 'rb')),
-            'K-Nearest Neighbors': pickle.load(open('assets/classification report/classification_KNN.pkl', 'rb')),
-            'XGBoost': pickle.load(open('assets/classification report/classification_xgb.pkl', 'rb')),
-            'Neural Network (Best Model)': pickle.load(open('assets/classification report/classification_Neural.pkl', 'rb'))
-        },
-        'roc_data': {
-            'Logistic Regression': pickle.load(open('assets/roc_curve/roc_data_LR.pkl', 'rb')),
-            'Random Forest': pickle.load(open('assets/roc_curve/roc_data_RF.pkl', 'rb')),
-            'Support Vector Machine': pickle.load(open('assets/roc_curve/roc_data_svc.pkl', 'rb')),
-            'K-Nearest Neighbors': pickle.load(open('assets/roc_curve/roc_data_KNN.pkl', 'rb')),
-            'XGBoost': pickle.load(open('assets/roc_curve/roc_data_xgb.pkl', 'rb')),
-            'Neural Network (Best Model)': pickle.load(open('assets/roc_curve/roc_data_neural.pkl', 'rb'))
-        },
-        'confusion_matrices': {
-            'Logistic Regression': pickle.load(open('assets/confusion matrix/confusion_LR.pkl', 'rb')),
-            'Random Forest': pickle.load(open('assets/confusion matrix/confusion_RF.pkl', 'rb')),
-            'Support Vector Machine': pickle.load(open('assets/confusion matrix/confusion_svc.pkl', 'rb')),
-            'K-Nearest Neighbors': pickle.load(open('assets/confusion matrix/confusion_KNN.pkl', 'rb')),
-            'XGBoost': pickle.load(open('assets/confusion matrix/confusion_xgb.pkl', 'rb')),
-            'Neural Network (Best Model)': pickle.load(open('assets/confusion matrix/confusion_Neural.pkl', 'rb'))
-        }
+        'classification_reports': {},
+        'roc_data': {},
+        'confusion_matrices': {}
     }
+    
+    # Load all evaluation files
+    for file_name, (data_type, model_name) in FILE_MAPPING.items():
+        if data_type in evaluation_data:
+            file_content = download_file_from_drive(file_name)
+            if file_content:
+                try:
+                    evaluation_data[data_type][model_name] = pickle.load(file_content)
+                except Exception as e:
+                    st.error(f"Error loading {data_type} for {model_name}: {str(e)}")
+    
     return evaluation_data
 
 evaluation_data = load_evaluation_data()
@@ -127,7 +181,7 @@ def predict_news(text, model_name):
         st.error(f"Error during prediction: {str(e)}")
         return None
 
-# Main app function
+# Main app function (keep your existing implementation)
 def main():
     st.title("📰 Fake News Detection System")
     
