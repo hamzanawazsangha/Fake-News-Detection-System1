@@ -41,12 +41,12 @@ def save_comment(name, email, comment):
 @st.cache_resource
 def load_models():
     models = {
-        'Logistic Regression': pickle.load(open('Logistic Regression.pkl', 'rb')),
-        'Random Forest': pickle.load(open('Random Forest.pkl', 'rb')),
-        'Support Vector Machine': pickle.load(open('SVC.pkl', 'rb')),
-        'K-Nearest Neighbors': pickle.load(open('KNeighbors Classifier.pkl', 'rb')),
-        'XGBoost': pickle.load(open('XGBOOST.pkl', 'rb')),
-        'Neural Network (Best Model)': load_model('Fakenews.h5')
+        'Logistic Regression': pickle.load(open('assets/models/Logistic Regression.pkl', 'rb')),
+        'Random Forest': pickle.load(open('assets/models/Random Forest.pkl', 'rb')),
+        'Support Vector Machine': pickle.load(open('assets/models/SVC.pkl', 'rb')),
+        'K-Nearest Neighbors': pickle.load(open('assets/models/KNeighbors Classifier.pkl', 'rb')),
+        'XGBoost': pickle.load(open('assets/models/XGBOOST.pkl', 'rb')),
+        'Neural Network (Best Model)': load_model('assets/models/Fakenews.h5')
     }
     return models
 
@@ -65,28 +65,28 @@ def load_evaluation_data():
             'Neural Network (Best Model)': 0.99
         },
         'classification_reports': {
-            'Logistic Regression': pickle.load(open('classification_LR.pkl', 'rb')),
-            'Random Forest': pickle.load(open('classification_RF.pkl', 'rb')),
-            'Support Vector Machine': pickle.load(open('classification_svc.pkl', 'rb')),
-            'K-Nearest Neighbors': pickle.load(open('classification_KNN.pkl', 'rb')),
-            'XGBoost': pickle.load(open('classification_xgb.pkl', 'rb')),
-            'Neural Network (Best Model)': pickle.load(open('classification_Neural.pkl', 'rb'))
+            'Logistic Regression': pickle.load(open('assets/classification report/classification_LR.pkl', 'rb')),
+            'Random Forest': pickle.load(open('assets/classification report/classification_RF.pkl', 'rb')),
+            'Support Vector Machine': pickle.load(open('assets/classification report/classification_svc.pkl', 'rb')),
+            'K-Nearest Neighbors': pickle.load(open('assets/classification report/classification_KNN.pkl', 'rb')),
+            'XGBoost': pickle.load(open('assets/classification report/classification_xgb.pkl', 'rb')),
+            'Neural Network (Best Model)': pickle.load(open('assets/classification report/classification_Neural.pkl', 'rb'))
         },
         'roc_data': {
-            'Logistic Regression': pickle.load(open('roc_data_LR.pkl', 'rb')),
-            'Random Forest': pickle.load(open('roc_data_RF.pkl', 'rb')),
-            'Support Vector Machine': pickle.load(open('roc_data_svc.pkl', 'rb')),
-            'K-Nearest Neighbors': pickle.load(open('roc_data_KNN.pkl', 'rb')),
-            'XGBoost': pickle.load(open('roc_data_xgb.pkl', 'rb')),
-            'Neural Network (Best Model)': pickle.load(open('roc_data_neural.pkl', 'rb'))
+            'Logistic Regression': pickle.load(open('assets/roc_curve/roc_data_LR.pkl', 'rb')),
+            'Random Forest': pickle.load(open('assets/roc_curve/roc_data_RF.pkl', 'rb')),
+            'Support Vector Machine': pickle.load(open('assets/roc_curve/roc_data_svc.pkl', 'rb')),
+            'K-Nearest Neighbors': pickle.load(open('assets/roc_curve/roc_data_KNN.pkl', 'rb')),
+            'XGBoost': pickle.load(open('assets/roc_curve/roc_data_xgb.pkl', 'rb')),
+            'Neural Network (Best Model)': pickle.load(open('assets/roc_curve/roc_data_neural.pkl', 'rb'))
         },
         'confusion_matrices': {
-            'Logistic Regression': pickle.load(open('confusion_LR.pkl', 'rb')),
-            'Random Forest': pickle.load(open('confusion_RF.pkl', 'rb')),
-            'Support Vector Machine': pickle.load(open('confusion_svc.pkl', 'rb')),
-            'K-Nearest Neighbors': pickle.load(open('confusion_KNN.pkl', 'rb')),
-            'XGBoost': pickle.load(open('confusion_xgb.pkl', 'rb')),
-            'Neural Network (Best Model)': pickle.load(open('confusion_Neural.pkl', 'rb'))
+            'Logistic Regression': pickle.load(open('assets/confusion matrix/confusion_LR.pkl', 'rb')),
+            'Random Forest': pickle.load(open('assets/confusion matrix/confusion_RF.pkl', 'rb')),
+            'Support Vector Machine': pickle.load(open('assets/confusion matrix/confusion_svc.pkl', 'rb')),
+            'K-Nearest Neighbors': pickle.load(open('assets/confusion matrix/confusion_KNN.pkl', 'rb')),
+            'XGBoost': pickle.load(open('assets/confusion matrix/confusion_xgb.pkl', 'rb')),
+            'Neural Network (Best Model)': pickle.load(open('assets/confusion matrix/confusion_Neural.pkl', 'rb'))
         }
     }
     return evaluation_data
